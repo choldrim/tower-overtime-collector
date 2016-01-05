@@ -109,6 +109,8 @@ class OvertimeAnalyze:
             subject = "%s 加班信息统计" % month_str
             print("sending email ...")
             self.send_email(subject=subject, files=[file_name])
+        else:
+            print("sorry, today is not the email-sending day, abort sending email.")
 
         print("finish.")
 
