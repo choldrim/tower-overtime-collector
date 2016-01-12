@@ -7,15 +7,20 @@ import os
 import re
 import requests
 import time
+import sys
 
 from datetime import datetime
 from datetime import timedelta
 from configparser import ConfigParser
 
+# third lib
+import requests
 import xlsxwriter
+
 from pyvirtualdisplay import Display
 from selenium import webdriver
 
+# my lib
 from lib.demail import Email
 
 
@@ -33,7 +38,15 @@ MAIL_RECEIVERS = "wangzhiling@linuxdeepin.com,wangdi@linuxdeepin.com"
 #MAIL_RECEIVERS = "tangcaijun@linuxdeepin.com"
 MAIL_CC = "tangcaijun@linuxdeepin.com"
 
+BASE_TOWER_URL = "tower.im/api/v2"
+TOWER_API = "https://%s" % BASE_TOWER_URL
+
+
 class ConfigController:
+
+    def __init__(self):
+        self.tower_token = ""
+
     def get_login_info(self):
         config = ConfigParser()
         config.read(USER_CONF_PATH)
@@ -41,11 +54,42 @@ class ConfigController:
         passwd = config["USER"]["UserPWD"]
         return username, passwd
 
+
     def get_tower_token(self):
-        config = ConfigParser()
-        config.read(USER_CONF_PATH)
-        token = config["USER"]["Token"]
-        return token
+        if self.tower_token == "":
+            config = ConfigParser()
+            config.read(USER_CONF_PATH)
+            username = config.get("USER", "UserName")
+            passwd = config.get("USER", "UserPWD")
+            client_id = config.get("DEEPIN", "ClientId")
+            client_secret = config.get("DEEPIN", "ClientSecret")
+
+            url = "https://%s:%s@%s/oauth/token" % (client_id, client_secret, BASE_TOWER_URL)
+            d = {"grant_type":"password", "username": username, "password": passwd}
+            success, data = self.__sendRequest(url, d)
+
+            if success:
+                self.tower_token = data.get("access_token")
+            else:
+                print("E: get tower access token error", file=sys.stderr)
+
+        return self.tower_token
+
+
+    def __sendRequest(self, url, d={}, h={}, method='POST'):
+        if method == 'POST':
+            resp = requests.post(url, data=d, headers=h)
+        elif method == 'GET':
+            resp = requests.get(url, data=d, headers=h)
+        else:
+            print("request method not supported")
+            return False, None
+
+        if resp.ok:
+            return True, resp.json()
+
+        print ("E: send request error: %s" % resp.text, file=sys.stderr)
+        return False, None
 
 
 class BrowserController:
