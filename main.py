@@ -34,7 +34,7 @@ USER_CONF_PATH = "%s/.AutoScriptConfig/tower-overtime-reportor/user.ini" % os.ge
 CAL_URL = "https://tower.im/teams/35e3a49a6e2e40fa919070f0cd9706c8/calendar_events/?start=%s&end=%s" % (start_date_str, end_date_str)
 OVERTIME_CALENDAR_GUID = "b96e5a357a884c7e8c5c2ab12858dd02"
 
-MAIL_RECEIVERS = "wangzhiling@linuxdeepin.com,wangdi@linuxdeepin.com"
+MAIL_RECEIVERS = "yinghongli@linuxdeepin.com,wangdi@linuxdeepin.com"
 #MAIL_RECEIVERS = "tangcaijun@linuxdeepin.com"
 MAIL_CC = "tangcaijun@linuxdeepin.com"
 
