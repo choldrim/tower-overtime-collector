@@ -173,6 +173,9 @@ class OvertimeAnalyze:
             bc = BrowserController()
             cal_data = bc.get_calendar_events()
 
+        from pprint import pprint
+        pprint(cal_data)
+
         for item in cal_data.get("calendar_events", []).copy():
             data = {}
             caleventable_guid = item.get("caleventable_guid")
