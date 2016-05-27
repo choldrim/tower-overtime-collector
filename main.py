@@ -24,10 +24,12 @@ from selenium import webdriver
 from lib.demail import Email
 
 
-now = datetime.now()
-last_month_last_date = now.replace(day=1) - timedelta(days=1)
+_now = datetime.now()
+last_month_last_date = _now.replace(day=1) - timedelta(days=1)
 start_date_str = "%s-%s-01" %(last_month_last_date.year, last_month_last_date.month)
 end_date_str = "%s-%s-%s"  % (last_month_last_date.year, last_month_last_date.month, last_month_last_date.day)
+#start_date_str = "2016-05-01"
+#end_date_str = "2016-05-31"
 
 SEND_DAY = 1  # day of every month
 USER_CONF_PATH = "%s/.AutoScriptConfig/tower-overtime-reportor/user.ini" % os.getenv("HOME")
