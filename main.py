@@ -26,18 +26,14 @@ from lib.demail import Email
 
 _now = datetime.now()
 last_month_last_date = _now.replace(day=1) - timedelta(days=1)
-start_date_str = "%s-%s-01" %(last_month_last_date.year, last_month_last_date.month)
-end_date_str = "%s-%s-%s"  % (last_month_last_date.year, last_month_last_date.month, last_month_last_date.day)
-#start_date_str = "2016-5-1"
-#end_date_str = "2016-5-31"
+START_DATE_STR = "%s-%s-01" %(last_month_last_date.year, last_month_last_date.month)
+END_DATE_STR = "%s-%s-%s"  % (last_month_last_date.year, last_month_last_date.month, last_month_last_date.day)
 
 SEND_DAY = 1  # day of every month
 USER_CONF_PATH = "%s/.AutoScriptConfig/tower-overtime-reportor/user.ini" % os.getenv("HOME")
-CAL_URL = "https://tower.im/teams/35e3a49a6e2e40fa919070f0cd9706c8/calendar_events/?start=%s&end=%s" % (start_date_str, end_date_str)
 OVERTIME_CALENDAR_GUID = "b96e5a357a884c7e8c5c2ab12858dd02"
 
 MAIL_RECEIVERS = "yinghongli@deepin.com,zhangfengling@deepin.com,zhangmingzhu@deepin.com,wangdi@deepin.com"
-#MAIL_RECEIVERS = "tangcaijun@deepin.com"
 MAIL_CC = "tangcaijun@deepin.com"
 
 BASE_TOWER_URL = "tower.im/api/v2"
@@ -127,6 +123,7 @@ class BrowserController:
 
 
     def get_calendar_events(self):
+        CAL_URL = "https://tower.im/teams/35e3a49a6e2e40fa919070f0cd9706c8/calendar_events/?start=%s&end=%s" % (START_DATE_STR, END_DATE_STR)
         self.browser.get(CAL_URL)
         source = self.browser.page_source
         el = self.browser.find_element_by_tag_name("body")
@@ -162,7 +159,7 @@ class OvertimeAnalyze:
 
     
     def get_month_str(self):
-        tmp_str_list = start_date_str.split("-")
+        tmp_str_list = START_DATE_STR.split("-")
         month_str = "%s-%s" % (tmp_str_list[0], tmp_str_list[1])
         return month_str
 
@@ -219,14 +216,14 @@ class OvertimeAnalyze:
         r = requests.get(url=url, headers=h)
         j = r.json()
         comments = j.get("comments")
-        if len(comments):
-            content = comments[0].get("content")
+        namelist = []
+        for comment in comments:
+            content = comment.get("content")
             a = re.compile(">@(\w+)<")
-            namelist = a.findall(content)
-            #print(namelist)
-            return " ".join(namelist)
+            namelist += a.findall(content)
 
-        return ""
+        namelist = list(set(namelist))
+        return " ".join(namelist)
 
 
     def write_excel(self, overtime_datas, file_name="./overtime.xlsx"):
@@ -301,6 +298,22 @@ class OvertimeAnalyze:
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--debug", help="debug mode: send email to debug user however", action="store_true")
+    parser.add_argument("start_day", nargs="?", help="start day, eg: 2016-8-1")
+    parser.add_argument("end_day", nargs="?", help="end day, eg: 2016-8-31")
+    args = parser.parse_args()
+    if args.debug:
+        # replace default var to debug var
+        MAIL_RECEIVERS = "tangcaijun@deepin.com"
+        SEND_DAY = datetime.now().day
+        if None in [args.start_day, args.end_day]:
+            print("Error: must specify start_day and end_day in debug mode\n")
+            parser.parse_args(["-h"])
+
+        START_DATE_STR = args.start_day
+        END_DATE_STR = args.end_day
+
     display = Display(visible=0, size=(1366, 768))
     display.start()
     oa = OvertimeAnalyze()
