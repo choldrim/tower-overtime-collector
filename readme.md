@@ -15,7 +15,7 @@ pip3 install -r requirements.txt
 ```
 
 #### help
-```py
+```sh
 # help
 python3 main.py --help
 ```
