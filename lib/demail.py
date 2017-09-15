@@ -7,7 +7,7 @@ from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-EMAIL_CONF = "%s/.AutoScriptConfig/tower-overtime-reportor/email.ini" % os.getenv("HOME")
+EMAIL_CONF = 'config.ini'
 
 FOOTER = """
 <br>
@@ -42,9 +42,9 @@ class Email:
     def __get_user_info(self):
         config = ConfigParser()
         config.read(EMAIL_CONF)
-        server = config["USER"]["SMTPServer"]
-        username = config["USER"]["UserName"]
-        passwd = config["USER"]["UserPWD"]
+        server = config["EMAIL"]["SMTPServer"]
+        username = config["EMAIL"]["UserName"]
+        passwd = config["EMAIL"]["UserPWD"]
         return server, username, passwd
 
 

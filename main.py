@@ -39,6 +39,8 @@ MAIL_CC = "tangcaijun@deepin.com"
 BASE_TOWER_URL = "tower.im/api/v2"
 TOWER_API = "https://%s" % BASE_TOWER_URL
 
+OUTPUT_DIR = './output'
+
 
 class ConfigController:
 
@@ -57,10 +59,10 @@ class ConfigController:
         if self.tower_token == "":
             config = ConfigParser()
             config.read(USER_CONF_PATH)
-            username = config.get("USER", "UserName")
-            passwd = config.get("USER", "UserPWD")
-            client_id = config.get("DEEPIN", "ClientId")
-            client_secret = config.get("DEEPIN", "ClientSecret")
+            username = config.get("TOWER", "UserName")
+            passwd = config.get("TOWER", "UserPWD")
+            client_id = config.get("TOWER", "ClientId")
+            client_secret = config.get("TOWER", "ClientSecret")
 
             url = "https://%s:%s@%s/oauth/token" % (client_id, client_secret, BASE_TOWER_URL)
             d = {"grant_type":"password", "username": username, "password": passwd}
@@ -142,8 +144,10 @@ class OvertimeAnalyze:
         #    data = json.load(fp)
         print("analyzing calendar ...")
         overtime_datas = self.analyze()
+
+        os.path.makedirs(OUTPUT_DIR, exist_ok=True)
         month_str = self.get_month_str()
-        file_name = "%s_overtime.xlsx" % (month_str)
+        file_name = "%s/%s_overtime.xlsx" % (OUTPUT_DIR, month_str)
 
         print("writing to excel ...")
         self.write_excel(overtime_datas, file_name)

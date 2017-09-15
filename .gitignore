@@ -1,2 +1,4 @@
 *.xlsx
+config.ini
+output
 __pycache__
